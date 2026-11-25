@@ -1,0 +1,82 @@
+/* PROBA „Živa tečnost“ (zivi.html): drugi deo u slikama 4:5; pravi sajt ovo ne učitava */
+
+/* Posle bare heroj stoji na ekranu dok se skroluje kroz stazu: skrol vodi baru u kupolu (glavno.js, faza
+   „bara“), pa heroj odlazi gore i nit ulazi u prvi deo. Nagore isto, unazad do bare. */
+.hero-staza { position: relative; }
+.hero-staza > .hero { position: sticky; top: 0; }
+.staza-kupole { height: 110svh; }
+
+.zivi {
+  padding-top: 0;
+  /* slika svakog dela: 4:5, na laptopu visoka skoro koliko ekran, na telefonu široka koliko ekran */
+  --kutija: min(calc(86vh * .8), 720px);
+  --razmak: clamp(28px, 3.5vw, 56px);
+}
+.zivi .jed + .jed { margin-top: 0; }          /* slike se dodiruju: nit iz jedne ulazi u sledeću */
+
+.z-red {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr var(--kutija) 1fr;
+  column-gap: var(--razmak);
+  align-items: center;
+  padding: 0 var(--ivica);
+}
+.z-slika { grid-column: 2; grid-row: 1; position: relative; width: var(--kutija); aspect-ratio: 4 / 5; margin: 0; }
+.z-slika img { display: block; width: 100%; height: 100%; mix-blend-mode: multiply; }
+.z-levo  { grid-column: 1; grid-row: 1; justify-self: end; text-align: right; max-width: 340px; }
+.z-desno { grid-column: 3; grid-row: 1; justify-self: start; max-width: 360px; }
+.z-oznaka { align-self: start; margin-top: 6vh; }
+
+/* opis svake usluge stoji u visini svoje reči u slici */
+.z-uz-redove { align-self: stretch; position: relative; width: 100%; max-width: 380px; }
+.z-stavka { position: absolute; left: 0; right: 0; top: var(--y); transform: translateY(-50%); }
+.z-stavka .telo { margin-top: 6px; max-width: none; font-size: clamp(15px, 1.15vw, 17px); line-height: 1.45; }
+
+/* koraci: tekst pored svog broja (1 i 3 levo, 2 i 4 desno) */
+.z-koraci { grid-column: 1 / -1; grid-row: 1; align-self: stretch; position: relative; list-style: none; pointer-events: none; }
+.z-korak { position: absolute; top: var(--y); transform: translateY(-50%); width: min(320px, calc((100% - var(--kutija)) / 2 - var(--razmak))); pointer-events: auto; }
+.z-korak.z-levo  { right: calc(50% + var(--kutija) / 2 + var(--razmak)); }
+.z-korak.z-desno { left: calc(50% + var(--kutija) / 2 + var(--razmak)); }
+.z-korak .telo { margin-top: 6px; font-size: clamp(15px, 1.2vw, 17px); }
+.z-broj { color: #9e75ad; margin-right: .15em; }
+
+/* kontakt: pravi tekst dugmeta stoji u tečnoj piluli iz slike (pilula: 190–890 × 560–790 od 1080 × 1350) */
+.z-dugme {
+  position: absolute;
+  left: 17.6%; width: 64.8%; top: 41.5%; height: 17%;
+  display: flex; align-items: center; justify-content: center; gap: .4em;
+  border-radius: 999px;
+  color: var(--tinta); text-decoration: none;
+  font: 600 clamp(17px, 2vw, 26px)/1 var(--tekst);
+}
+.z-dugme:focus-visible { outline: 2px solid var(--lila-duboka); outline-offset: 4px; }
+.z-podaci { justify-content: flex-start; padding-bottom: 0; margin-top: 18px; }
+
+/* Telefon i tablet (do 1099 px): slika na sredini, tekst ispod; na tabletu slika najviše 600 px, da tekst ne
+   bude stisnut pored nje */
+@media (max-width: 1099px) {
+  .zivi { --kutija: min(100vw, 600px); }
+  .z-red { grid-template-columns: 1fr; padding: 0; row-gap: 22px; padding-bottom: 40px; }
+  .z-slika { grid-column: 1; grid-row: auto; justify-self: center; }
+  .z-levo, .z-desno { grid-column: 1; grid-row: auto; justify-self: center; text-align: center; max-width: 34ch; padding: 0 20px; }
+  .z-oznaka { order: -1; margin-top: 32px; }
+  .z-uz-redove { display: grid; gap: 26px; max-width: 36ch; }
+  .z-stavka { position: static; transform: none; }
+  .z-koraci { grid-column: 1; grid-row: auto; display: grid; gap: 24px; padding: 0 20px; }
+  .z-korak { position: static; transform: none; width: auto; text-align: center; max-width: 34ch; justify-self: center; }
+  .z-guss .z-slika { order: -1; }              /* nit iz bare ulazi pravo u snimak; oba teksta ispod */
+  .z-kontakt .z-levo { order: -1; margin-top: 32px; }
+  .z-podaci { justify-content: center; }
+}
+
+/* Tečnost ide skrolom: platno crta kadar koji bira skrol (zivi-proba.js); bez JS-a se vidi gotova slika */
+.z-snimak img, .z-snimak canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; mix-blend-mode: multiply; }
+.js .z-snimak .z-kraj { display: none; }
+/* tekst se pojavi kad ga tečnost „stigne“: data-pri = deo trajanja poslednjeg snimka u delu (zivi-proba.js);
+   „translate“, ne „transform“, jer opisi i koraci već stoje na mestu preko transform-a */
+.js .z-red:has(.z-snimak) [data-pri], .js .z-snimak .z-dugme {
+  pointer-events: none;   /* nevidljivo se ne klikće */
+  opacity: 0; translate: 0 12px; transition: opacity .9s var(--uspori), translate .9s var(--uspori);
+}
+.js .z-red:has(.z-snimak) [data-pri].vidi, .js .jed.stoji [data-pri], .js .jed.stoji .z-dugme { opacity: 1; translate: none; pointer-events: auto; }
