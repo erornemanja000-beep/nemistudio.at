@@ -13,6 +13,9 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body { background: var(--belo); color: var(--tinta); }
+/* Dodir bez plave mrlje pregledača; tastatura ima svoj jasan okvir */
+html { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--lila-duboka); outline-offset: 4px; }
 /* Na telefonu prevlačenje ne sme da povuče stranicu ni da je osveži */
 html, body { overscroll-behavior: none; }
 
@@ -156,6 +159,24 @@ body {
 }
 .jezik button[aria-pressed="true"] { color: var(--tinta); }
 
+/* Dugme menija postoji samo na telefonu (na laptopu su tri reči u traci) */
+.meni-dugme { display: none; }
+
+/* Cilj za prst je bar 44 px; slova ostaju iste veličine (proširuje se samo nevidljivi prostor oko njih) */
+.traka .logo, .jezik button, .meni-dugme, .meni a, .kontakt-podaci a, .podnozje-veze a { position: relative; }
+@media (max-width: 1099px), (pointer: coarse) {
+  .traka .logo::after, .jezik button::after, .meni-dugme::after, .meni a::after, .kontakt-podaci a::after, .podnozje-veze a::after {
+    content: "";
+    position: absolute;
+    inset: -14px -8px;
+  }
+  .traka .logo::after { inset: -8px -6px; }
+  .jezik button:first-child::after { inset: -12px -2px -10px -18px; }
+  .jezik button:last-child::after { inset: -12px calc(var(--ivica) * -1) -10px -2px; }
+  .meni-dugme::after { inset: -12px -8px -10px; }
+  .kontakt-podaci a::after { inset: -12px -8px; }
+}
+
 /* Donji red */
 .opis {
   position: absolute;
@@ -268,7 +289,59 @@ body:not(.ucitavanje) .ucitac { opacity: 0; pointer-events: none; }
 /* ---------- Telefon ---------- */
 
 @media (max-width: 760px) {
-  .meni { display: none; }
+  /* Meni: dugme na sredini trake otvori beli list preko heroja sa tri velike reči */
+  .meni-dugme {
+    display: block;
+    visibility: hidden;   /* u uvodu još nema trake */
+    position: absolute;
+    left: 50%;
+    top: var(--ivica);
+    transform: translateX(-50%);
+    padding: 6px;
+    background: none;
+    border: 0;
+    color: var(--tinta);
+    font: 500 12px/1 var(--tekst);
+    letter-spacing: .08em;
+    cursor: pointer;
+  }
+  .spremno .meni-dugme { visibility: visible; }
+  .meni-dugme .zatvori, .otvoren .meni-dugme .otvori { display: none; }
+  .otvoren .meni-dugme .zatvori { display: inline; }
+  .traka.otvoren { z-index: 7; }
+  .traka .logo, .jezik, .meni-dugme { z-index: 1; }
+  .jezik { position: relative; }
+  .meni {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100svh;
+    min-height: 560px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: var(--belo);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .35s var(--uspori), visibility 0s .35s;
+  }
+  .otvoren .meni { visibility: visible; opacity: 1; transition: opacity .35s var(--uspori); }
+  .meni a {
+    padding: 12px 16px;
+    background: none;
+    font-family: var(--display);
+    font-stretch: 125%;
+    font-weight: 800;
+    font-size: clamp(32px, 11vw, 60px);
+    line-height: 1;
+    letter-spacing: -.02em;
+  }
+  .meni a::after { content: none; }
+  .meni a:active { color: var(--lila-duboka); }
+  /* položen telefon: tri reči moraju da stanu u nisku visinu */
+  @media (max-height: 520px) { .meni { min-height: 0; padding-top: 44px; gap: 0; } .meni a { font-size: clamp(28px, 11vh, 44px); padding-block: 4px; } }
   .ime { top: clamp(70px, 12vh, 110px); }
   .opis {
     left: var(--ivica);
@@ -286,6 +359,13 @@ body:not(.ucitavanje) .ucitac { opacity: 0; pointer-events: none; }
     bottom: calc(var(--ivica) + env(safe-area-inset-bottom));
   }
   .savet { bottom: calc(var(--ivica) + 66px + env(safe-area-inset-bottom)); }
+}
+
+/* Uspravan telefon: kapuljača počinje na 30 % visine heroja (pravougaonik() u glavno.js). Na niskom ekranu
+   ime i dva reda se zato podignu tačno toliko da stanu iznad nje; na višem ostaju gde su bili */
+@media (max-width: 760px) and (max-aspect-ratio: 4/5) {
+  .ime { top: min(clamp(70px, 12vh, 110px), max(52px, 30% - 56px - max(64.3px, 17.6vw))); }
+  .opis { top: min(clamp(70px, 12vh, 110px) + 24vw, 30% - 45.8px); }
 }
 
 /* ---------- Drugi deo: tečnost kroz cevi ---------- */
@@ -345,7 +425,7 @@ body:not(.ucitavanje) .ucitac { opacity: 0; pointer-events: none; }
 .foto:has(.sloj-foto.vidi) img { opacity: 0; }
 
 /* Cev između fotografija: isečak prave staklene cevi iz fotografije, ponovljen naniže; puna cev
-   (tečnost) raste odozgo dok tečnost teče (deo2.js) */
+   (tečnost) raste odozgo dok tečnost teče */
 .spojevi { position: absolute; inset: 0; pointer-events: none; }
 .spoj {
   position: absolute;
@@ -497,7 +577,7 @@ body:not(.ucitavanje) .ucitac { opacity: 0; pointer-events: none; }
 
 @media (max-width: 699px) {
   /* Telefon: fotografija preko cele širine, tekst u jednoj koloni na sredini; cev između delova
-     ulazi u zid (spojevi.js crta samo kratke krajeve), pa tekst može preko ose */
+     ulazi u zid, pa tekst može preko ose */
   .kalupi { --foto: 100vw; padding-top: 48px; }
   .dvokol { grid-template-columns: 1fr; padding: 0 20px; justify-items: center; text-align: center; }
   .dvokol > .levo, .dvokol > .desno { grid-column: 1; justify-self: center; text-align: center; max-width: 34ch; }

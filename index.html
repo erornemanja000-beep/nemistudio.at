@@ -3,15 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NEMI STUDIO · Digitalstudio aus Wien</title>
-<meta name="description" content="NEMI STUDIO baut Websites, die man fühlt. Digitalstudio aus Wien.">
+<title data-de="NEMI STUDIO · Digitalstudio aus Wien" data-en="NEMI STUDIO · Digital studio from Vienna">NEMI STUDIO · Digitalstudio aus Wien</title>
+<meta name="description" content="NEMI STUDIO baut Websites, die man fühlt. Digitalstudio aus Wien." data-opis-de="NEMI STUDIO baut Websites, die man fühlt. Digitalstudio aus Wien." data-opis-en="NEMI STUDIO builds websites you can feel. Digital studio from Vienna.">
 <meta name="theme-color" content="#ffffff">
+<link rel="canonical" href="https://nemistudio.at/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NEMI STUDIO">
+<meta property="og:locale" content="de_AT">
+<meta property="og:locale:alternate" content="en_GB">
+<meta property="og:url" content="https://nemistudio.at/">
+<meta property="og:title" content="NEMI STUDIO · Digitalstudio aus Wien">
+<meta property="og:description" content="Websites, die man fühlt.">
+<meta property="og:image" content="https://nemistudio.at/deljenje.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1050">
+<meta property="og:image:height" content="550">
+<meta property="og:image:alt" content="Gründer von NEMI STUDIO in lila Jacke mit Sturmhaube">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="stil.css">
-<link rel="stylesheet" href="zivi-proba.css">
+<link rel="stylesheet" href="drugi-deo.css">
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body class="ucitavanje">
@@ -24,11 +39,12 @@
   <canvas id="model" aria-hidden="true"></canvas>
   <canvas id="arak" aria-hidden="true"></canvas>
   <canvas id="otisak" aria-hidden="true"></canvas>
-  <img class="rezerva" src="media/glavna-slika.jpg" alt="Gründer von NEMI STUDIO in lila Jacke mit Sturmhaube">
+  <img class="rezerva" loading="lazy" src="media/glavna-slika.jpg" alt="Gründer von NEMI STUDIO in lila Jacke mit Sturmhaube">
 
   <header class="traka">
     <a class="logo" href="#hero" aria-label="NEMI STUDIO">NEMI<br>STUDIO</a>
-    <nav class="meni" aria-label="Hauptmenü">
+    <button class="meni-dugme" type="button" aria-expanded="false" aria-controls="meni"><span class="otvori" data-de="Menü" data-en="Menu">Menü</span><span class="zatvori" data-de="Schließen" data-en="Close">Schließen</span></button>
+    <nav class="meni" id="meni" aria-label="Hauptmenü" data-oznaka-de="Hauptmenü" data-oznaka-en="Main menu">
       <a href="#leistungen" data-de="Leistungen" data-en="Services">Leistungen</a>
       <a href="#ablauf" data-de="Ablauf" data-en="Process">Ablauf</a>
       <a href="#kontakt" data-de="Kontakt" data-en="Contact">Kontakt</a>
@@ -57,8 +73,7 @@
 <div class="staza-kupole" aria-hidden="true"></div>
 </div>
 
-<!-- PROBA „Živa tečnost“: drugi deo složen od probnih slika (pokret kasnije dolazi iz snimaka).
-     Pravi sajt je index.html; ova stranica je samo za pregled rasporeda. -->
+<!-- Drugi deo: „Živa tečnost“, vodi ga skrol (drugi-deo.js) -->
 <main class="kalupi zivi">
   <canvas class="tecnost-senke" aria-hidden="true"></canvas>
 
@@ -70,7 +85,7 @@
     <div class="z-red">
       <p class="uvod z-levo" data-pri="0.6" data-de="NEMI STUDIO ist ein Digitalstudio aus Wien." data-en="NEMI STUDIO is a digital studio from Vienna.">NEMI STUDIO ist ein Digitalstudio aus Wien.</p>
       <figure class="z-slika z-snimak" data-niz="g1:121 g2:145">
-        <img class="z-kraj" src="media/zivi/niz/g2/144.jpg" alt="" width="920" height="1150">
+        <img class="z-kraj" loading="lazy" src="media/zivi/niz/g2/144.jpg" alt="" width="920" height="1150">
         <canvas width="920" height="1150" aria-hidden="true"></canvas>
       </figure>
       <p class="uvod drugi z-desno" data-pri="0.7" data-de="Wir entwerfen und bauen Websites von Grund auf – Design, Code, Bewegung und Bild aus einer Hand." data-en="We design and build websites from the ground up – design, code, motion and imagery from a single source.">Wir entwerfen und bauen Websites von Grund auf – Design, Code, Bewegung und Bild aus einer Hand.</p>
@@ -81,17 +96,17 @@
     <div class="z-red">
       <h2 class="nadnaslov z-levo z-oznaka" id="bauen-naslov" data-de="Was wir bauen" data-en="What we build">Was wir bauen</h2>
       <figure class="z-slika z-snimak" data-niz="b1:150">
-        <img class="z-kraj" src="media/zivi/niz/b1/149.jpg" alt="" width="920" height="1150">
+        <img class="z-kraj" loading="lazy" src="media/zivi/niz/b1/149.jpg" alt="" width="920" height="1150">
         <canvas width="920" height="1150" aria-hidden="true"></canvas>
       </figure>
       <div class="z-desno z-uz-redove">
-        <article class="z-stavka" style="--y: 22.2%" data-pri="0.26"><h3 class="nevidljivo" data-de="Marken" data-en="Brands">Marken</h3>
+        <article class="z-stavka" style="--y: 22.2%" data-pri="0.26"><h3 class="naslov z-ime" data-de="Marken" data-en="Brands">Marken</h3>
           <p class="meta" data-de="Konzept · Design · Texte · Fotos" data-en="Concept · Design · Copy · Photos">Konzept · Design · Texte · Fotos</p>
           <p class="telo" data-de="Websites, die zeigen, wer du bist. Startseite, Angebot, Team und Kontakt – gestaltet wie eine Kampagne, nicht wie eine Vorlage." data-en="Websites that show who you are. Home, offer, team and contact – designed like a campaign, not like a template.">Websites, die zeigen, wer du bist. Startseite, Angebot, Team und Kontakt – gestaltet wie eine Kampagne, nicht wie eine Vorlage.</p></article>
-        <article class="z-stavka" style="--y: 50%" data-pri="0.4"><h3 class="nevidljivo" data-de="Shops" data-en="Shops">Shops</h3>
+        <article class="z-stavka" style="--y: 50%" data-pri="0.4"><h3 class="naslov z-ime" data-de="Shops" data-en="Shops">Shops</h3>
           <p class="meta" data-de="Produktseiten · Bezahlung · Versand · Pflege" data-en="Product pages · Payment · Shipping · Care">Produktseiten · Bezahlung · Versand · Pflege</p>
           <p class="telo" data-de="Shops, in denen man gern einkauft: klare Produkte, schneller Checkout, auf dem Handy genauso gut wie am Laptop." data-en="Shops people enjoy buying from: clear products, fast checkout, as good on the phone as on the laptop.">Shops, in denen man gern einkauft: klare Produkte, schneller Checkout, auf dem Handy genauso gut wie am Laptop.</p></article>
-        <article class="z-stavka" style="--y: 77.8%" data-pri="0.88"><h3 class="nevidljivo" data-de="Erlebnisse" data-en="Experiences">Erlebnisse</h3>
+        <article class="z-stavka" style="--y: 77.8%" data-pri="0.88"><h3 class="naslov z-ime" data-de="Erlebnisse" data-en="Experiences">Erlebnisse</h3>
           <p class="meta" data-de="3D · Video · Scroll-Szenen · KI-Bilder" data-en="3D · Video · Scroll scenes · AI imagery">3D · Video · Scroll-Szenen · KI-Bilder</p>
           <p class="telo" data-de="3D, Video und Bewegung für Launches, Kampagnen und alle, die auffallen wollen. So wie diese Seite hier." data-en="3D, video and motion for launches, campaigns and anyone who wants to stand out. Like this very page.">3D, Video und Bewegung für Launches, Kampagnen und alle, die auffallen wollen. So wie diese Seite hier.</p></article>
       </div>
@@ -102,13 +117,13 @@
     <div class="z-red">
       <h2 class="nadnaslov z-levo z-oznaka" id="ablauf-naslov" data-de="So arbeiten wir" data-en="How we work">So arbeiten wir</h2>
       <figure class="z-slika z-snimak" data-niz="a1:150">
-        <img class="z-kraj" src="media/zivi/niz/a1/149.jpg" alt="" width="920" height="1150">
+        <img class="z-kraj" loading="lazy" src="media/zivi/niz/a1/149.jpg" alt="" width="920" height="1150">
         <canvas width="920" height="1150" aria-hidden="true"></canvas>
       </figure>
       <ol class="z-koraci">
         <li class="z-korak z-levo" style="--y: 20%" data-pri="0.12"><h3 class="naslov"><span class="z-broj">1</span> <span data-de="Kennenlernen" data-en="Getting to know">Kennenlernen</span></h3><p class="telo" data-de="Ein kostenloses Gespräch, 30 Minuten. Du erzählst, wir hören zu." data-en="A free 30-minute call. You talk, we listen.">Ein kostenloses Gespräch, 30 Minuten. Du erzählst, wir hören zu.</p></li>
         <li class="z-korak z-desno" style="--y: 40%" data-pri="0.28"><h3 class="naslov"><span class="z-broj">2</span> <span data-de="Konzept" data-en="Concept">Konzept</span></h3><p class="telo" data-de="Struktur, Texte und Gestaltung. Du siehst deine Website, bevor sie gebaut wird." data-en="Structure, copy and design. You see your website before it is built.">Struktur, Texte und Gestaltung. Du siehst deine Website, bevor sie gebaut wird.</p></li>
-        <li class="z-korak z-levo" style="--y: 60%" data-pri="0.46"><h3 class="naslov"><span class="z-broj">3</span> <span data-de="Guss" data-en="Pour">Guss</span></h3><p class="telo" data-de="Wir bauen alles von Hand: schnell, mobil, auf Deutsch und Englisch." data-en="We build everything by hand: fast, mobile, in German and English.">Wir bauen alles von Hand: schnell, mobil, auf Deutsch und Englisch.</p></li>
+        <li class="z-korak z-levo" style="--y: 60%" data-pri="0.46"><h3 class="naslov"><span class="z-broj">3</span> <span data-de="Guss" data-en="Pour">Guss</span></h3><p class="telo" data-de="Wir bauen ohne Baukasten: schnell, mobil, auf Deutsch und Englisch." data-en="We build without page builders: fast, mobile, in German and English.">Wir bauen ohne Baukasten: schnell, mobil, auf Deutsch und Englisch.</p></li>
         <li class="z-korak z-desno" style="--y: 80%" data-pri="0.68"><h3 class="naslov"><span class="z-broj">4</span> <span data-de="Start" data-en="Launch">Start</span></h3><p class="telo" data-de="Online gehen, testen, betreuen. Wir bleiben auch danach für dich da." data-en="Go live, test, look after it. We stay with you afterwards too.">Online gehen, testen, betreuen. Wir bleiben auch danach für dich da.</p></li>
       </ol>
     </div>
@@ -118,7 +133,7 @@
     <div class="z-red">
       <p class="uvod z-levo" data-pri="0.35" data-de="Unser erstes Werk siehst du gerade: diese Website." data-en="You are looking at our first piece of work: this website.">Unser erstes Werk siehst du gerade: diese Website.</p>
       <figure class="z-slika z-snimak" data-niz="k1:121">
-        <img class="z-kraj" src="media/zivi/niz/k1/120.jpg" alt="" width="920" height="1150">
+        <img class="z-kraj" loading="lazy" src="media/zivi/niz/k1/120.jpg" alt="" width="920" height="1150">
         <canvas width="920" height="1150" aria-hidden="true"></canvas>
         <a class="z-dugme" data-pri="0.9" href="mailto:nemistudio7@gmail.com?subject=Projekt"><span data-de="Projekt anfragen" data-en="Start a project">Projekt anfragen</span> <span aria-hidden="true">→</span></a>
       </figure>
@@ -134,13 +149,13 @@
 <footer class="podnozje">
   <span class="logo">NEMI<br>STUDIO</span>
   <span>© 2026 NEMI STUDIO · Wien</span>
-  <nav class="podnozje-veze" aria-label="Rechtliches">
+  <nav class="podnozje-veze" aria-label="Rechtliches" data-oznaka-de="Rechtliches" data-oznaka-en="Legal">
     <a href="#" data-de="Impressum" data-en="Imprint">Impressum</a>
     <a href="#" data-de="Datenschutz" data-en="Privacy">Datenschutz</a>
   </nav>
 </footer>
 
 <script src="glavno.js"></script>
-<script src="zivi-proba.js"></script>
+<script src="drugi-deo.js"></script>
 </body>
 </html>

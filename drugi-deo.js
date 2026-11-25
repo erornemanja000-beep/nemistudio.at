@@ -1,5 +1,5 @@
-// PROBA „Živa tečnost“ (zivi.html): drugi deo ide skrolom (nizovi kadrova tečnosti)
-// U pozadini drugog dela su iste senke lišća kao u deo2.js.
+// Drugi deo sajta, „Živa tečnost“: ide skrolom (nizovi kadrova tečnosti)
+// U pozadini su iste senke lišća kao u heroju.
 (() => {
   const main = document.querySelector('.kalupi');
   if (!main) return;
@@ -20,7 +20,7 @@
     skrol();
   }
 
-  // ---------- Senke lišća (prepisano iz deo2.js) ----------
+  // ---------- Senke lišća ----------
   const senke = main.querySelector('.tecnost-senke');
   const staza = document.querySelector('.staza-kupole');
   const gs = senke.getContext('webgl', { alpha: false, antialias: false });

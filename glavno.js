@@ -34,12 +34,11 @@
     uronOd: 2.5, uronDo: 4.1,
     predaja: 0.86             // deo urona posle kog model crta WebGL (i rastu slova)
   };
-  // Topljenje posle klika na logo: kadrovi iz AI snimaka (media/topljenje, [kadar | maska] kao kod
-  // ruke). Korisnik: „istog trenutka odjednom postane tečnost“, pa pretvaranje u lila „ogrtač“ (kadrovi
+  // Topljenje posle klika na logo: kadrovi (media/topljenje, [kadar | maska] kao kod
+  // ruke). Model istog trenutka postane tečnost: pretvaranje u lila „ogrtač“ (kadrovi
   // 0–64) traje samo 0,3 s, a slegne se u baru (64–187) sve sporije, od iste brzine kao na spoju (~210
   // kadrova/s) do brzineBare. Kamera prati tečnost dok bara (dno na 0,964 visine kadra) ne legne na dno
-  // ekrana. Na probnoj stranici „Živa tečnost“ (zivi.html) bara posle toga oživi (kadrovi 188–283, AI snimak
-  // poravnat na kadar 187): talasa se, niču šiljci, digne se u kupolu i pusti pipke preko donje ivice. Tu
+  // ekrana. Bara posle toga oživi (kadrovi 188–283, poravnati na kadar 187): talasa se, niču šiljci, digne se u kupolu i pusti pipke preko donje ivice. Tu
   // više ne ide sat nego skrol (faza „bara“): čim bara legne stranica se otključa, heroj stoji na ekranu dok
   // se skroluje kroz .staza-kupole, a skrol bira kadar; nagore se sve vraća do bare.
   const ZIVA = !!document.querySelector('.zivi');
@@ -77,14 +76,44 @@
   scrollTo(0, 0);
 
   // ---------- Jezik ----------
-  document.querySelectorAll('[data-jezik]').forEach(dugme => {
-    dugme.addEventListener('click', () => {
-      const j = dugme.dataset.jezik;
-      document.documentElement.lang = j;
-      document.querySelectorAll('[data-jezik]').forEach(d => d.setAttribute('aria-pressed', String(d === dugme)));
-      document.querySelectorAll('[data-de]').forEach(el => { el.textContent = el.dataset[j]; });
-    });
+  // Sa tekstom idu i naslov kartice, opis i oznake menija; izbor se pamti (ako pregledač to dozvoljava)
+  const dugmadJezika = document.querySelectorAll('[data-jezik]');
+  function postaviJezik(j) {
+    document.documentElement.lang = j;
+    dugmadJezika.forEach(d => d.setAttribute('aria-pressed', String(d.dataset.jezik === j)));
+    document.querySelectorAll('[data-de]').forEach(el => { el.textContent = el.dataset[j]; });
+    document.querySelectorAll('[data-oznaka-de]').forEach(el => el.setAttribute('aria-label', el.getAttribute('data-oznaka-' + j)));
+    const opis = document.querySelector('meta[name="description"]');
+    opis.content = opis.getAttribute('data-opis-' + j);
+  }
+  dugmadJezika.forEach(dugme => dugme.addEventListener('click', () => {
+    postaviJezik(dugme.dataset.jezik);
+    try { localStorage.setItem('nemi-jezik', dugme.dataset.jezik); } catch (e) { /* bez pamćenja */ }
+  }));
+  try { if (localStorage.getItem('nemi-jezik') === 'en') postaviJezik('en'); } catch (e) { /* ostaje nemački */ }
+
+  // ---------- Meni na telefonu ----------
+  // Dugme otvori beli list preko heroja sa tri reči; dodir na listu i dugmetu ne dira ruku
+  const traka = document.querySelector('.traka');
+  const meni = document.getElementById('meni');
+  const meniDugme = document.querySelector('.meni-dugme');
+  function otvoriMeni(da) {
+    traka.classList.toggle('otvoren', da);
+    meniDugme.setAttribute('aria-expanded', String(da));
+  }
+  const meniOtvoren = () => traka.classList.contains('otvoren');
+  meniDugme.addEventListener('click', () => otvoriMeni(!meniOtvoren()));
+  traka.addEventListener('click', e => { if (e.target.closest('a')) otvoriMeni(false); });
+  addEventListener('scroll', () => { if (meniOtvoren()) otvoriMeni(false); }, { passive: true });
+  addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || !meniOtvoren()) return;
+    otvoriMeni(false);
+    meniDugme.focus();
   });
+  for (const dogadjaj of ['pointerdown', 'pointermove', 'pointerup']) {
+    meniDugme.addEventListener(dogadjaj, e => e.stopPropagation());
+    meni.addEventListener(dogadjaj, e => { if (meniOtvoren()) e.stopPropagation(); });
+  }
 
   // ---------- Šejderi ----------
   const VERTEKS = `attribute vec2 p;varying vec2 vUv;
@@ -260,9 +289,9 @@ void main(){
     izrezan = izreziModel(tekstura);
     if (window.createImageBitmap) izrezan = await createImageBitmap(izrezan).catch(() => izrezan);
     // Svaka slika se nacrta jednom unapred, da prvo pravo crtanje u uvodu ne čeka na nju
-    const proba = document.createElement('canvas');
-    proba.width = proba.height = 256;
-    const pc = proba.getContext('2d');
+    const malo = document.createElement('canvas');
+    malo.width = malo.height = 256;
+    const pc = malo.getContext('2d');
     for (const sl of [...slicice, izrezan]) if (sl) pc.drawImage(sl, 0, 0, 8, 8);
   }
 
@@ -303,6 +332,11 @@ void main(){
   // pa svi kadrovi topljenja do bare (da topljenje nikad ne čeka). Dok traje ruka: ostatak ruke, pa oživljavanje
   // bare. Kad krene topljenje ruka više ne treba, pa prvo oživljavanje bare (skrol ga čeka), a ostatak ruke tek
   // ako se uvod pusti ponovo (dopuniKadrove). Kadrovi topljenja su u istom nizu posle ruke (od indeksa mreza.n).
+  // Na dodirnim ekranima druga polovina kadrova ruke čeka prvi dodir: ko samo gleda, preuzme topljenje, ruku na
+  // pola gustine i kupolu, pa preuzimanje stane. Od dodira stiže ostatak, prvo kadrovi najbliži prstu.
+  // STEDI = false vraća preuzimanje svega odmah.
+  const STEDI = true;
+  let dodirnuto = false;
   let dopuniKadrove = () => {};
   async function ucitajKadrove() {
     const lako = telefon() ? '-t' : '', n = mreza.n, T = TOPLJENJE;
@@ -310,22 +344,37 @@ void main(){
       const [klip, kadar] = mreza.cvorovi[i];
       return i === 0 ? `media/ruka${lako}/mir/000.jpg` : `media/ruka${lako}/${klip}/${ime(kadar)}`;
     };
-    const osnovni = [], ostatakRuke = [], kupola = [], vec = new Set();
+    const stedi = STEDI && (telefon() || matchMedia('(hover: none)').matches);
+    const osnovni = [], polaRuke = [], ostatakRuke = [], kupola = [], vec = new Set();
     const u = (niz, i) => { if (!vec.has(i)) { vec.add(i); niz.push(i); } };
     u(osnovni, 0); u(osnovni, mreza.grudi);
     for (let i = 1; i < n; i += 4) u(osnovni, i);
     const prvi = new Set(osnovni);
     for (let j = 0; j <= T.bara; j++) u(osnovni, n + j);
+    if (stedi) for (let i = 3; i < n; i += 4) u(polaRuke, i);
     for (let i = 1; i < n; i++) u(ostatakRuke, i);
     // kupola na preskok (svaki četvrti, pa poslednji, pa ostali): skrol je odmah grubo pokreće, pa se dopuni
     for (let j = T.bara + 1; j < T.kadrova; j += 4) u(kupola, n + j);
     u(kupola, n + T.kadrova - 1);
     for (let j = T.bara + 1; j < T.kadrova; j++) u(kupola, n + j);
     let sledeci = 0, radnika = 0;
+    const najblizi = niz => {
+      if (!niz.length || !pokazivac) return niz.shift();
+      const pu = (pokazivac.x - R.x) / R.w, pv = (pokazivac.y - R.y) / R.h;
+      let naj = 0, min = Infinity;
+      niz.forEach((i, k) => {
+        const d = Math.hypot(mreza.x[i] - pu, (mreza.y[i] - pv) * VISINA);
+        if (d < min) { min = d; naj = k; }
+      });
+      return niz.splice(naj, 1)[0];
+    };
     const sledeciKadar = () => {
       if (sledeci < osnovni.length) return osnovni[sledeci++];
-      if (faza === 'uvod' || faza === 'ruka') return ostatakRuke.length ? ostatakRuke.shift() : kupola.shift();
-      return kupola.shift();
+      if (faza !== 'uvod' && faza !== 'ruka') return kupola.shift();
+      if (!stedi) return ostatakRuke.shift() ?? kupola.shift();
+      // dok niko ne dodirne: ruka na pola gustine, pa kupola; od dodira ostatak, prvo ruka oko prsta
+      if (!dodirnuto) return polaRuke.shift() ?? kupola.shift();
+      return najblizi(polaRuke) ?? najblizi(ostatakRuke) ?? kupola.shift();
     };
     const radnik = async () => {
       radnika++;
@@ -399,7 +448,7 @@ void main(){
       }
     }
     const sused = susedi.map(s => s[0] ?? 0);
-    // oštrina šake u svakom kadru (AI snimak je u brzom pokretu zamućen)
+    // oštrina šake u svakom kadru (u brzom pokretu je zamućena)
     const ostrina = Float32Array.from(m.cvorovi, c => c[5] ?? 6);
     return { n, cvorovi: m.cvorovi, x, y, veze, D, K, duz, sused, ostrina, logo: m.logo, grudi: m.grudi, ceo: !!m.ceo };
   }
@@ -1065,7 +1114,7 @@ void main(){
     } else if (faza === 'ruka' && rukaSpremna) {
       senka = 1;
       if (TOPI !== null) {
-        // Provera topljenja: dlan odmah na grudi, pa topljenje čim se taj kadar dekodira
+        // ?topi: dlan odmah na grudi, pa topljenje čim se taj kadar dekodira
         poz.a = poz.b = mreza.grudi; poz.t = 0;
         dekodiraj(mreza.grudi);
         if (bitmape.get(mreza.grudi)) { prikazano = mreza.grudi; zapocniTopljenje(t); }
@@ -1153,8 +1202,8 @@ void main(){
         w: r0.w + (kw - r0.w) * kam,
         h: r0.h + (kh - r0.h) * kam
       };
-      // Kad se bara slegne, stranica sama pređe u drugi deo (bara ostaje na dnu heroja). Na „Živoj
-      // tečnosti“ se stranica samo otključa, a dalje vodi skrol (osim ako je posetilac tražio neki deo).
+      // Kad se bara slegne, stranica sama pređe u drugi deo (bara ostaje na dnu heroja). Uz „Živu
+      // tečnost“ se stranica samo otključa, a dalje vodi skrol (osim ako je posetilac tražio neki deo).
       if (ZIVA && topKadar >= T.bara) {
         if (!otkljucano) otkljucaj(!!ciljSkrola);
         kupola = T.bara;
@@ -1253,6 +1302,7 @@ void main(){
     pustenoU = null;
     pokretU = sad();
     smirenCilj = null;
+    if (!dodirnuto) { dodirnuto = true; dopuniKadrove(); }
     if (faza === 'ruka' && prviPokret === null) prviPokret = sad();
   };
   const uHeroju = e => {
@@ -1262,7 +1312,8 @@ void main(){
   hero.addEventListener('pointermove', uHeroju);
   hero.addEventListener('pointerleave', e => {
     if (e.pointerType === 'mouse') pokazivac = null;
-    else pustenoU = sad();
+    // prst koji je već pušten ne sme ponovo da pokrene ruku (dodir menija izaziva novi pointerleave)
+    else if (pustenoU === null) pustenoU = sad();
   });
   hero.addEventListener('pointerdown', e => {
     uHeroju(e);
@@ -1309,6 +1360,7 @@ void main(){
   }
   addEventListener('wheel', e => { if (!otkljucano && e.deltaY > 0) trazimTopljenje(null); }, { passive: true });
   addEventListener('keydown', e => {
+    if (e.key === ' ' && e.target.closest('button')) return;   // razmak na dugmetu samo pritisne dugme
     if (!otkljucano && (e.key === 'PageDown' || e.key === ' ' || e.key === 'End')) trazimTopljenje(null);
   });
   document.querySelectorAll('a[href^="#"]:not(.logo)').forEach(a => {
@@ -1333,7 +1385,7 @@ void main(){
     document.addEventListener('visibilitychange', slusaj);
   });
 
-  // Klik na logo pušta uvod ponovo (zgodno kad se sajt pokazuje mušteriji).
+  // Klik na logo pušta uvod ponovo (ceo prvi utisak ispočetka).
   function ponoviUvod() {
     if (faza === 'ucitavanje' || smanjenPokret) return;
     // Slova i meni se vraćaju odmah, bez animacije
