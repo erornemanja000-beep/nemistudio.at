@@ -94,13 +94,16 @@ void main(){gl_FragColor=vec4(mix(vec3(1.),vec3(.86,.84,.9),lisce(vec2(vUv.x*uRe
   });
   if (!delovi.length) return;
 
-  // Kadrovi se preuzimaju tek kad krene topljenje (da ne otimaju heroju): prvi i poslednji odmah, pa redom
+  // Kadrovi se preuzimaju tek kad krene topljenje (da ne otimaju heroju)
   let pocni = false;
   document.addEventListener('nemi:logo', () => { pocni = true; });
   const ucitaj = D => {
     if (D.ucitava) return;
     D.ucitava = true;
-    const red = [0, D.N - 1, ...Array.from({ length: D.N - 2 }, (_, i) => i + 1)];
+    // od grubog ka finom: prvi i poslednji, pa svaki 16., 8., 4., 2. i na kraju svaki kadar — cela animacija
+    // je odmah upotrebljiva (grublje), čak i kad se skroluje brže nego što kadrovi stižu
+    const red = [0, D.N - 1], vec = new Set(red);
+    for (const korak of [16, 8, 4, 2, 1]) for (let i = 0; i < D.N; i += korak) if (!vec.has(i)) { vec.add(i); red.push(i); }
     let s = 0;
     const radnik = async () => {
       while (s < red.length) {
